@@ -16,7 +16,7 @@ def get_data(url):
             return r.text
         else:
             # If the request was not successful, print an error message
-            print(f"Error: Unable to fetch data. Status code: {response.status_code}")
+            print(f"Error: Unable to fetch data. Status code: {r.status_code}")
             return None
 
     except Exception as e:
@@ -25,28 +25,27 @@ def get_data(url):
         return None
 
 
-html_data = get_data("https://weather.com/en-IN/weather/today/l/25.59,85.14?par=google&temp=c/")
+# Get data from url by calling the get_data function and storing it in a variable
+html_data = get_data("https://weather.com/en-GH/weather/today/l/GHXX0001:1:GH")
 
+# parse data in html format using Beautiful Soup
 soup = BeautifulSoup(html_data, "html.parser")
 
+# format the parsed data
 pretty_html = soup.prettify()
 
-print(pretty_html)
 
-current_temp = soup.find_all("span",
+# Find the span with the current temperature
+current_temp_span = soup.find("span", class_="_-_-components-src-organism-CurrentConditions-CurrentConditions--tempValue--MHmYY")
 
-                             class_=" _-_-components-src-organism-CurrentConditions-CurrentConditions--tempValue--MHmYY")
+# Find the div with chances of rain
+chances_rain_div = soup.find("div", class_="_-_-components-src-organism-CurrentConditions-CurrentConditions--precipValue--2aJSf")
 
-chances_rain = soup.find_all("div",
+# Extract the text content
+current_temp = current_temp_span.get_text(strip=True) if current_temp_span else "N/A"
+chances_rain = chances_rain_div.get_text(strip=True) if chances_rain_div else "N/A"
 
-                             class_="_-_-components-src-organism-CurrentConditions-CurrentConditions--precipValue--2aJSf")
-
-temp = (str(current_temp))
-
-temp_rain = str(chances_rain)
-
-result = "current_temp " + temp[128:-9] + "  in Sunyani, Ghana" + "\n" + temp_rain[131:-14]
-
-
+# Construct the result string
+result = f"Current temperature is {current_temp} in Accra, Ghana\nChances of rain: {chances_rain}"
 
 n.show_toast("Weather update", result, duration = 10)
